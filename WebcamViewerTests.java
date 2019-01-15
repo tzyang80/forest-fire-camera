@@ -3,7 +3,9 @@ package webcamtest;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.imageio.ImageIO;
 
@@ -32,6 +34,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 
 import com.github.sarxos.webcam.Webcam;
+//import com.github.sarxos.webcam.WebcamUtils;
 
 public class WebcamViewerTests extends Application {
 
@@ -49,6 +52,7 @@ public class WebcamViewerTests extends Application {
 	private Button btnCamreaStart;
 	private Button btnCameraPicture;
 	private int num = 0;
+	private String filePath = "C:/Users/McFlurry/Desktop/";
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -252,7 +256,10 @@ public class WebcamViewerTests extends Application {
 	
 	protected void takePictureFromWebCam() {
 		try {
-			ImageIO.write(grabbedImage, "PNG", new File("photo" + num + ".png"));
+			File file = new File(filePath + "testimage " + num + ".png");
+			OutputStream out = new FileOutputStream(file);
+			ImageIO.write(grabbedImage, "PNG", file);
+			out.close();
 			num++;
 		} catch (IOException e) {
 			e.printStackTrace();
