@@ -36,6 +36,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 
 import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.WebcamResolution;
 //import com.github.sarxos.webcam.WebcamUtils;
 
 public class WebcamViewerTests extends Application {
@@ -146,23 +147,17 @@ public class WebcamViewerTests extends Application {
 	}
 
 	protected void initializeWebCam(final int webCamIndex) {
-		
+	
 		Task<Void> webCamTask = new Task<Void>() {
-			
 			@Override
 			protected Void call() throws Exception {
-				
 				if(webCam != null)
 				{
 					disposeWebCamCamera();
-					webCam = Webcam.getWebcams().get(webCamIndex);
-					webCam.open();
-				}else
-				{
-					webCam = Webcam.getWebcams().get(webCamIndex);
-					webCam.open();
 				}
-				
+				webCam = Webcam.getWebcams().get(webCamIndex);
+				webCam.setCustomViewSizes(WebcamResolution.HD.getSize());
+				webCam.open();				
 				startWebCamStream();
 				return null;
 			}
@@ -179,16 +174,12 @@ public class WebcamViewerTests extends Application {
 		
 		stopCamera  = false;
 		Task<Void> task = new Task<Void>() {
-
-		
 			@Override
 			protected Void call() throws Exception {
 
 				while (!stopCamera) {
 					try {
 						if ((grabbedImage = webCam.getImage()) != null) {
-							
-//							System.out.println("Captured Image height*width:"+grabbedImage.getWidth()+"*"+grabbedImage.getHeight());
 							Platform.runLater(new Runnable() {
 								@Override
 								public void run() {
@@ -199,9 +190,9 @@ public class WebcamViewerTests extends Application {
 							});
 
 							grabbedImage.flush();
-
 						}
 					} catch (Exception e) {
+					
 					} finally {
 
 					}
