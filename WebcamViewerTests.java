@@ -1,8 +1,13 @@
+package application;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import javax.imageio.ImageIO;
 
@@ -48,8 +53,7 @@ public class WebcamViewerTests extends Application {
 	private Button btnCamreaStop;
 	private Button btnCamreaStart;
 	private Button btnCameraPicture;
-	private int num = 0;
-	private String filePath = "C:/Users/McFlurry/Desktop/";
+	private String filePath = "//CSSDFS03/Student_l$/jelouie/My Documents/Downloads/pics/";
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -253,11 +257,11 @@ public class WebcamViewerTests extends Application {
 	
 	protected void takePictureFromWebCam() {
 		try {
-			File file = new File(filePath + "testimage " + num + ".png");
+			String timeStamp = new SimpleDateFormat("MMM dd, yyyy - [HH.mm.ss]").format(new Timestamp(System.currentTimeMillis()));
+			File file = new File(filePath + timeStamp + ".png");
 			OutputStream out = new FileOutputStream(file);
 			ImageIO.write(grabbedImage, "PNG", file);
 			out.close();
-			num++;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
