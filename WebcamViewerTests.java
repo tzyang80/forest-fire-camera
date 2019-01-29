@@ -1,4 +1,4 @@
-package application;
+package webcamtest;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 import javax.imageio.ImageIO;
 
@@ -51,14 +50,13 @@ public class WebcamViewerTests extends Application {
 	private BufferedImage grabbedImage;
 	ObjectProperty<Image> imageProperty = new SimpleObjectProperty<Image>();
 	private BorderPane webCamPane;
-	private Button btnCamreaStop;
-	private Button btnCamreaStart;
+	private Button btnCameraStartAndStop;
 	private Button btnCameraPicture;
-	private String filePath = "//CSSDFS03/Student_l$/jelouie/My Documents/Downloads/pics/";
-	
+	private String filePath = "C:/Users/McFlurry/Desktop/";
+
 	@Override
 	public void start(Stage primaryStage) {
-		
+
 		primaryStage.setTitle("Connecting WebCam Using Sarxos API");
 		root = new BorderPane();
 		topPane = new FlowPane();
@@ -69,7 +67,7 @@ public class WebcamViewerTests extends Application {
 		root.setTop(topPane);
 		webCamPane = new BorderPane();
 		webCamPane.setStyle("-fx-background-color: #ccc;");
-	    imgWebCamCapturedImage = new ImageView();
+		imgWebCamCapturedImage = new ImageView();
 		webCamPane.setCenter(imgWebCamCapturedImage);
 		root.setCenter(webCamPane);
 		createTopPanel();
@@ -82,27 +80,27 @@ public class WebcamViewerTests extends Application {
 		bottomCameraControlPane.setDisable(true);
 		createCameraControls();
 		root.setBottom(bottomCameraControlPane);
-		
+
 		primaryStage.setScene(new Scene(root));
 		primaryStage.setHeight(700);
 		primaryStage.setWidth(600);
 		primaryStage.centerOnScreen();
 		primaryStage.show();
-		
+
 		Platform.runLater(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				
+
 				setImageViewSize();
 			}
 		});
-		
+
 	}
-	
+
 
 	protected void setImageViewSize() {
-		
+
 		double height = webCamPane.getHeight();
 		double width  = webCamPane.getWidth();
 		imgWebCamCapturedImage.setFitHeight(height);
@@ -110,7 +108,7 @@ public class WebcamViewerTests extends Application {
 		imgWebCamCapturedImage.prefHeight(height);
 		imgWebCamCapturedImage.prefWidth(width);
 		imgWebCamCapturedImage.setPreserveRatio(true);
-		
+
 	}
 
 
@@ -119,7 +117,7 @@ public class WebcamViewerTests extends Application {
 		int webCamCounter = 0;
 		Label lbInfoLabel = new Label("Select Your WebCam Camera");
 		ObservableList<WebCamInfo> options = FXCollections.observableArrayList();
-		
+
 		topPane.getChildren().add(lbInfoLabel);
 		for(Webcam webcam:Webcam.getWebcams())
 		{
@@ -134,20 +132,20 @@ public class WebcamViewerTests extends Application {
 		cameraOptions.setPromptText(cameraListPromptText);
 		cameraOptions.getSelectionModel().selectedItemProperty().addListener(new  ChangeListener<WebCamInfo>() {
 
-	        @Override
-	        public void changed(ObservableValue<? extends WebCamInfo> arg0, WebCamInfo arg1, WebCamInfo arg2) {
-	            if (arg2 != null) {
-	               
-	            	System.out.println("WebCam Index: " + arg2.getWebCamIndex()+": WebCam Name:"+ arg2.getWebCamName());
-	            	initializeWebCam(arg2.getWebCamIndex());
-	            }
-	        }
-	    });
+			@Override
+			public void changed(ObservableValue<? extends WebCamInfo> arg0, WebCamInfo arg1, WebCamInfo arg2) {
+				if (arg2 != null) {
+
+					System.out.println("WebCam Index: " + arg2.getWebCamIndex()+": WebCam Name:"+ arg2.getWebCamName());
+					initializeWebCam(arg2.getWebCamIndex());
+				}
+			}
+		});
 		topPane.getChildren().add(cameraOptions);
 	}
 
 	protected void initializeWebCam(final int webCamIndex) {
-	
+
 		Task<Void> webCamTask = new Task<Void>() {
 			@Override
 			protected Void call() throws Exception {
@@ -157,21 +155,21 @@ public class WebcamViewerTests extends Application {
 				}
 				webCam = Webcam.getWebcams().get(webCamIndex);
 				webCam.setCustomViewSizes(WebcamResolution.HD.getSize());
+				webCam.setViewSize(WebcamResolution.HD.getSize());
 				webCam.open();				
 				startWebCamStream();
 				return null;
 			}
 		};
-		
+
 		Thread webCamThread = new Thread(webCamTask);
 		webCamThread.setDaemon(true);
 		webCamThread.start();
 		bottomCameraControlPane.setDisable(false);
-		btnCamreaStart.setDisable(true);
 	}
 
 	protected void startWebCamStream() {
-		
+
 		stopCamera  = false;
 		Task<Void> task = new Task<Void>() {
 			@Override
@@ -192,7 +190,7 @@ public class WebcamViewerTests extends Application {
 							grabbedImage.flush();
 						}
 					} catch (Exception e) {
-					
+
 					} finally {
 
 					}
@@ -208,44 +206,39 @@ public class WebcamViewerTests extends Application {
 		th.setDaemon(true);
 		th.start();
 		imgWebCamCapturedImage.imageProperty().bind(imageProperty);
-		
+
 	}
 
 	private void createCameraControls() {
-		
-		btnCamreaStop = new Button();
-		btnCamreaStop.setOnAction(new EventHandler<ActionEvent>() {
-			
+
+		btnCameraStartAndStop = new Button ();
+		btnCameraStartAndStop.setOnAction(new EventHandler<ActionEvent>() {
+
 			@Override
 			public void handle(ActionEvent arg0) {
-				
-				stopWebCamCamera();
+				if(stopCamera) {
+					startWebCamCamera();
+					btnCameraStartAndStop.setText("Stop Camera");
+				} else {
+					stopWebCamCamera();
+					btnCameraStartAndStop.setText("Start Camera");
+				}
 			}
 		});
-		btnCamreaStop.setText("Stop Camera");
-		btnCamreaStart = new Button();
-		btnCamreaStart.setOnAction(new EventHandler<ActionEvent>() {
-			
-			@Override
-			public void handle(ActionEvent arg0) {
-				startWebCamCamera();
-			}
-		});
-		btnCamreaStart.setText("Start Camera");
+		btnCameraStartAndStop.setText("Stop Camera");
 		btnCameraPicture = new Button();
 		btnCameraPicture.setText("Take Picture");
 		btnCameraPicture.setOnAction(new EventHandler<ActionEvent>() {
-			
+
 			@Override
 			public void handle(ActionEvent arg0) {
 				takePictureFromWebCam();
 			}
 		});
-		bottomCameraControlPane.getChildren().add(btnCamreaStart);
-		bottomCameraControlPane.getChildren().add(btnCamreaStop);
+		bottomCameraControlPane.getChildren().add(btnCameraStartAndStop);
 		bottomCameraControlPane.getChildren().add(btnCameraPicture);
 	}
-	
+
 	protected void takePictureFromWebCam() {
 		try {
 			String timeStamp = new SimpleDateFormat("MMM dd, yyyy - [HH.mm.ss]").format(new Timestamp(System.currentTimeMillis()));
@@ -259,37 +252,31 @@ public class WebcamViewerTests extends Application {
 	}
 
 	protected void disposeWebCamCamera() {
-		
+
 		stopCamera = true;
 		webCam.close();
-		btnCamreaStart.setDisable(true);
-		btnCamreaStop.setDisable(true);
 	}
 
 	protected void startWebCamCamera() {
-		
+
 		stopCamera = false;
 		startWebCamStream();
-		btnCamreaStop.setDisable(false);
-		btnCamreaStart.setDisable(true);
 	}
 
 	protected void stopWebCamCamera() {
-		
+
 		stopCamera = true;
-		btnCamreaStart.setDisable(false);
-		btnCamreaStop.setDisable(true);
 	}
 
 	public static void main(String[] args) {
 		launch(args);
 	}
-	
+
 	class WebCamInfo
 	{
 		private String webCamName ;
 		private int webCamIndex ;
-		
+
 		public String getWebCamName() {
 			return webCamName;
 		}
@@ -302,11 +289,11 @@ public class WebcamViewerTests extends Application {
 		public void setWebCamIndex(int webCamIndex) {
 			this.webCamIndex = webCamIndex;
 		}
-		
+
 		@Override
 		public String toString() {
-		        return webCamName;
-	     }
-		
-}
+			return webCamName;
+		}
+
+	}
 }
