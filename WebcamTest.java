@@ -1,4 +1,5 @@
-package m;
+package test_UI;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -8,6 +9,8 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
 import javax.imageio.ImageIO;
+
+import com.github.sarxos.webcam.Webcam;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -33,9 +36,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 
-import com.github.sarxos.webcam.Webcam;
-//import com.github.sarxos.webcam.WebcamUtils;
-
 public class WebcamTest extends Application {
 
 	ObjectProperty<Image> imageProperty = new SimpleObjectProperty<Image>();
@@ -43,8 +43,10 @@ public class WebcamTest extends Application {
 	private FlowPane bottomCameraControlPane;
 	private FlowPane topPane;
 	private FlowPane testPane;
+	
 	private BorderPane root;
 	private BorderPane root2;
+	
 	private String cameraListPromptText = "Choose Camera";
 	private ImageView imgWebCamCapturedImage;
 	private Webcam webCam = null;
@@ -58,6 +60,7 @@ public class WebcamTest extends Application {
 	private String filePath = getPath(); // this will be get path
 	private Scene camera;
 
+	//In this method we define and make the panes of the camera + approval scenes 
 	@Override
 	public void start(Stage primaryStage) {
 
@@ -233,7 +236,7 @@ public class WebcamTest extends Application {
 					try {
 						if ((grabbedImage = webCam.getImage()) != null) {
 
-							//								System.out.println("Captured Image height*width:"+grabbedImage.getWidth()+"*"+grabbedImage.getHeight());
+							
 							Platform.runLater(new Runnable() {
 								@Override
 								public void run() {
@@ -265,6 +268,7 @@ public class WebcamTest extends Application {
 
 	}
 
+	//Creates buttons that control the camera 
 	private void createCameraControls(Stage primaryStage, Scene approvePhoto) {
 		btnCameraStartAndStop = new Button ();
 		btnCameraStartAndStop.setOnAction(new EventHandler<ActionEvent>() {
@@ -290,6 +294,7 @@ public class WebcamTest extends Application {
 		bottomCameraControlPane.getChildren().add(btnCameraStartAndStop);
 	}
 
+	//allows the user to approve and cancel recently taken photos
 	protected void approve(Stage primaryStage, Scene approvePhoto) {
 		File tempfile = takePictureFromWebCam();
 		Image image = new Image(tempfile.toURI().toString());
@@ -299,11 +304,13 @@ public class WebcamTest extends Application {
 		cancel.setOnAction(e -> canclePhoto(primaryStage, tempfile));
 	}	
 	
+	//deletes canceled photos 
 	protected void canclePhoto(Stage primaryStage, File tempfile) {
 		tempfile.delete();
 		primaryStage.setScene(camera);
 	}
 	
+	//takes a picture and saves it as a .png with a time stamp as the name
 	protected File takePictureFromWebCam() {
 		try {
 			String timeStamp = new SimpleDateFormat("MMM dd, yyyy - [HH.mm.ss.SSS]").format(new Timestamp(System.currentTimeMillis()));
