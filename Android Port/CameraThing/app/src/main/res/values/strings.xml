@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">CameraThing</string>
+    <string name="title_activity_camera">CameraActivity</string>
+    <string name="title_activity_display">DisplayActivity</string>
+    <string name="placeholder">PLACEHOLDER</string>
+    <string name="take_a_pic">Take a pic!</string>
+    <string name="capture">Capture</string>
+    <string name="test">test</string>
+</resources>
